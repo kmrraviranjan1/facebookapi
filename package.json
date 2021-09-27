@@ -1,0 +1,11 @@
+{
+  "name": "facebookapi",
+  "version": "1.0.0",
+  "description": "Backend api of facebook",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ravi Akshay Omkar Vaibhav",
+  "license": "ISC"
+}
