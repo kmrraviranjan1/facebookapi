@@ -2,9 +2,10 @@
   "name": "facebookapi",
   "version": "1.0.0",
   "description": "Backend api of facebook",
-  "main": "index.js",
+  "main": "src/server",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server":"nodemon src/server"
   },
   "author": "Ravi Akshay Omkar Vaibhav",
   "license": "ISC",
