@@ -1,14 +1,26 @@
-const express = require('express');
-const cors = require('cors')
-const connect = require('./configs/db')
 
+const express = require("express");
+require("dotenv").config();
+const connect = require("./config/db.js");
+const cors = require("cors");
+const port = process.env.PORT || 8080;
+
+const { register, login } = require("./controller/auth.controller");
 const postController = require('./controller/post.controller')
 
-const app = express()
-app.use(cors())
-app.use(express.json())
-app.use('/posts',postController)
-app.listen(2345, async ()=>{
-    await connect()
-    console.log('listening on port 2345')
-})
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/posts',postController)
+app.post("/api/register", register);
+app.post("/api/login", login);
+
+const start = async () => {
+  app.listen(port, async () => {
+    await connect();
+    console.log("Listening to port " + port);
+  });
+};
+
+module.exports = start;
