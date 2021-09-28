@@ -9,7 +9,13 @@ var validateEmail = function (email) {
 
 const userSchema = mongoose.Schema(
   {
-    first_name: { type: String, required: true, minLength: 3, maxLength: 20 },
+    first_name: {
+      type: String,
+      required: true,
+      minLength: 3,
+      maxLength: 20,
+      unique: true,
+    },
     last_name: { type: String, required: false, minLength: 3, maxLength: 20 },
     email: {
       type: String,
@@ -37,6 +43,7 @@ const userSchema = mongoose.Schema(
     profile: { type: String, required: false },
     cover: { type: String, required: false },
     bio: { type: String, required: false },
+    education: [{ type: String, required: false }],
     city: { type: String, required: false },
     country: { type: String, required: false },
     university: { type: String, required: false },
