@@ -2,9 +2,9 @@
   "name": "facebookapi",
   "version": "1.0.0",
   "description": "Backend api of facebook",
-  "main": "src/index.js",
+  "main": "index",
   "scripts": {
-    "server": "nodemon src/index"
+    "server": "nodemon index"
   },
   "author": "Ravi Akshay Omkar Vaibhav",
   "license": "ISC",
