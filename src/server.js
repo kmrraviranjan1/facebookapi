@@ -17,7 +17,7 @@ app.use("/api/posts", postController);
 app.post("/api/register", register);
 app.post("/api/login", login);
 app.use("/api/user", userController);
-app.use("/api/comment", commentController);
+app.use("/api/comments", commentController);
 
 const start = async () => {
   app.listen(port, async () => {
