@@ -12,9 +12,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/posts',postController)
 app.post("/api/register", register);
 app.post("/api/login", login);
+app.use('/api/posts',postController)
 
 const start = async () => {
   app.listen(port, async () => {
