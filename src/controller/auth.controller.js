@@ -53,6 +53,9 @@ const login = async (req, res) => {
       { email: main.email },
       { isOnline: true }
     )
+      .populate("friends")
+      .populate("friendRequestSent")
+      .populate("friendRequestRecieved")
       .lean()
       .exec();
     res.status(201).json({ token, userOnline });
