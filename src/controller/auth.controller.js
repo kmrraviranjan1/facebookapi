@@ -49,7 +49,10 @@ const login = async (req, res) => {
       });
     }
     const token = newToken(user);
-    let userOnline = await User.findOneAndUpdate({ isOnline: true })
+    let userOnline = await User.findOneAndUpdate(
+      { email: main.email },
+      { isOnline: true }
+    )
       .lean()
       .exec();
     res.status(201).json({ token, userOnline });
