@@ -10,8 +10,24 @@ router.get("/all/:id", async (req, res) => {
   res.status(201).json({ user });
 });
 
+
+//get all users who are not his friends
+router.get("", async (req, res) => {
+  const users = await User.find().populate("friends")
+    .lean()
+    .exec();
+
+  res.status(201).json({ users });
+});
+
+//dummy user post request
+router.post("", async (req, res) => {
+  console.log(req.body)
+  const user = await User.create(req.body);
+  return res.status(201).json({ user });
+})
 // Get all friends
-router.get("/friends", async (req, res) => {});
+router.get("/friends", async (req, res) => { });
 
 // send friend friendRequest
 router.post("/sendRequest/:id", async (req, res) => {
@@ -50,15 +66,15 @@ router.post("/sendRequest/:id", async (req, res) => {
         sender.friendRequestSent.length == 0
           ? []
           : sender.friendRequestSent.filter(
-              (i) => i.toString() !== req.body.id
-            );
+            (i) => i.toString() !== req.body.id
+          );
 
       b =
         reciever.friendRequestRecieved.length == 0
           ? []
           : reciever.friendRequestRecieved.filter(
-              (i) => i.toString() !== req.params.id
-            );
+            (i) => i.toString() !== req.params.id
+          );
 
       a.push(reciever._id);
       b.push(sender._id);
@@ -160,15 +176,15 @@ router.post("/rejectRequest/:id", async (req, res) => {
       rejector.friendRequestRecieved.length == 0
         ? []
         : rejector.friendRequestRecieved.filter(
-            (i) => i.toString() !== req.body.id
-          );
+          (i) => i.toString() !== req.body.id
+        );
 
     let b =
       sender.friendRequestSent.length == 0
         ? []
         : sender.friendRequestSent.filter(
-            (i) => i.toString() !== req.params.id
-          );
+          (i) => i.toString() !== req.params.id
+        );
     console.log(a, b);
     const rejected = await User.findByIdAndUpdate(req.params.id, {
       friendRequestRecieved: a,
@@ -234,15 +250,17 @@ router.post("/unfriend/:id", async (req, res) => {
 
 // update User
 router.patch("/:id", async (req, res) => {
+  console.log(req.body)
   const user = await User.findByIdAndUpdate(req.params.id, req.body)
     .lean()
     .exec();
+  console.log("patch succesful")
 
   res.status(201).json({ user });
 });
 // Get user details
 router.get("/:id", async (req, res) => {
-  const user = await User.findById(req.params.id).lean().exec();
+  const user = await User.findById(req.params.id).populate("friends").lean().exec();
 
   res.status(201).json({ user });
 });
