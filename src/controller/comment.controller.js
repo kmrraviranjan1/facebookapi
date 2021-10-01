@@ -8,7 +8,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const comments = await Comment.find().lean().exec();
+  const comments = await Comment.find().sort({createdAt:-1}).lean().exec();
 
   console.log("comment get call made");
   res.status(200).json({ comments });

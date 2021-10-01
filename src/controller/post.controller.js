@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const posts = await Post.find().lean().exec();
+  const posts = await Post.find().sort({createdAt:-1}).lean().exec();
 
   console.log("get call made");
   res.status(200).json({ posts });
