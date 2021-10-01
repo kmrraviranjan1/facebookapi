@@ -1,9 +1,15 @@
 const router = require("express").Router();
 const User = require("../model/user.model");
 
-// update User
-router.patch("/:id", async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body)
+//get all users who are not his friends
+router.get("/all/:id", async (req, res) => {
+  const user = await User.find({
+    $and: [
+      { friends: { $nin: [req.params.id] } },
+      { friendRequestRecieved: { $nin: [req.params.id] } },
+      { _id: { $ne: req.params.id } },
+    ],
+  })
     .lean()
     .exec();
 
@@ -14,7 +20,6 @@ router.patch("/:id", async (req, res) => {
 router.get("/friends", async (req, res) => {});
 
 // send friend friendRequest
-
 router.post("/sendRequest/:id", async (req, res) => {
   try {
     const sender = await User.findById(req.params.id).lean().exec();
@@ -60,16 +65,6 @@ router.post("/sendRequest/:id", async (req, res) => {
           : reciever.friendRequestRecieved.filter(
               (i) => i.toString() !== req.params.id
             );
-      // console.log(
-      //   //a.includes(req.body.id),
-      //   //b.includes(req.params.id),
-      //   //b[0].equals(req.params.id),
-      //   //b[0].equals(req.body.id),
-      //   //   req.params.id,
-      //   //   req.body.id
-      //   a,
-      //   b
-      // );
 
       a.push(reciever._id);
       b.push(sender._id);
@@ -160,6 +155,86 @@ router.post("/acceptRequest/:id", async (req, res) => {
   }
 });
 
+//Reject Friend Request
+router.post("/rejectRequest/:id", async (req, res) => {
+  try {
+    const rejector = await User.findById(req.params.id).lean().exec();
+    const sender = await User.findById(req.body.id).lean().exec();
+
+    let a =
+      rejector.friendRequestRecieved.length == 0
+        ? []
+        : rejector.friendRequestRecieved.filter(
+            (i) => i.toString() !== req.body.id
+          );
+
+    let b =
+      sender.friendRequestSent.length == 0
+        ? []
+        : sender.friendRequestSent.filter(
+            (i) => i.toString() !== req.params.id
+          );
+    console.log(a, b);
+    const rejected = await User.findByIdAndUpdate(req.params.id, {
+      friendRequestRecieved: a,
+    })
+      .lean()
+      .exec();
+
+    const recieved = await User.findByIdAndUpdate(req.body.id, {
+      friendRequestSent: b,
+    })
+      .lean()
+      .exec();
+    res.status(201).json({ rejected, recieved });
+  } catch (err) {
+    return res.status(401).json({
+      status: "failed",
+      message: "Something went wrong",
+    });
+  }
+});
+
+// Cancel Friend Request
+router.post("/cancelRequest/:id", async (req, res) => {
+  try {
+    const rejector = await User.findById(req.params.id).lean().exec();
+    const sender = await User.findById(req.body.id).lean().exec();
+
+    let a =
+      rejector.friendRequestSent.length == 0
+        ? []
+        : rejector.friendRequestSent.filter(
+            (i) => i.toString() !== req.body.id
+          );
+
+    let b =
+      sender.friendRequestRequest.length == 0
+        ? []
+        : sender.friendRequestRequest.filter(
+            (i) => i.toString() !== req.params.id
+          );
+    console.log(a, b);
+    const cancelledBy = await User.findByIdAndUpdate(req.params.id, {
+      friendRequestSent: a,
+    })
+      .lean()
+      .exec();
+
+    const canceledUser = await User.findByIdAndUpdate(req.body.id, {
+      friendRequestRequest: b,
+    })
+      .lean()
+      .exec();
+    res.status(201).json({ cancelledBy, canceledUser });
+  } catch (err) {
+    return res.status(401).json({
+      status: "failed",
+      message: "Something went wrong",
+    });
+  }
+});
+
 // Remove || Unfriend Request
 router.post("/unfriend/:id", async (req, res) => {
   try {
@@ -202,11 +277,27 @@ router.post("/unfriend/:id", async (req, res) => {
   }
 });
 
+// update User
+router.patch("/:id", async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body)
+      .lean()
+      .exec();
+
+    res.status(201).json({ user });
+  } catch (err) {
+    return res.status(401).json({ message: err });
+  }
+});
 // Get user details
 router.get("/:id", async (req, res) => {
-  const user = await User.findById(req.params.id).lean().exec();
+  try {
+    const user = await User.findById(req.params.id).lean().exec();
 
-  res.status(201).json({ user });
+    res.status(201).json({ user });
+  } catch (err) {
+    return res.status(401).json({ message: err });
+  }
 });
 
 module.exports = router;
