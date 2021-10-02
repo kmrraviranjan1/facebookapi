@@ -3,7 +3,13 @@ const User = require("../model/user.model");
 
 //get all users who are not his friends
 router.get("/all/:id", async (req, res) => {
-  const user = await User.find({ friends: { $nin: [req.params.id] } })
+  const user = await User.find({
+    $and: [
+      { friends: { $nin: [req.params.id] } },
+      { friendRequestRecieved: { $nin: [req.params.id] } },
+      { _id: { $ne: req.params.id } },
+    ],
+  })
     .lean()
     .exec();
 
@@ -85,15 +91,23 @@ router.post("/sendRequest/:id", async (req, res) => {
       });
     }
 
-    const sent = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestSent: a,
-    })
+    const sent = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestSent: a,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const recieved = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestRecieved: b,
-    })
+    const recieved = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestRecieved: b,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ sent, recieved });
@@ -143,17 +157,25 @@ router.post("/acceptRequest/:id", async (req, res) => {
       });
     }
 
-    const sent = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestSent: b,
-      friends: bList,
-    })
+    const sent = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestSent: b,
+        friends: bList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const accepted = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestRecieved: a,
-      friends: aList,
-    })
+    const accepted = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestRecieved: a,
+        friends: aList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ sent, accepted });
@@ -166,7 +188,6 @@ router.post("/acceptRequest/:id", async (req, res) => {
 });
 
 //Reject Friend Request
-
 router.post("/rejectRequest/:id", async (req, res) => {
   try {
     const rejector = await User.findById(req.params.id).lean().exec();
@@ -186,18 +207,74 @@ router.post("/rejectRequest/:id", async (req, res) => {
           (i) => i.toString() !== req.params.id
         );
     console.log(a, b);
-    const rejected = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestRecieved: a,
-    })
+    const rejected = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestRecieved: a,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const recieved = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestSent: b,
-    })
+    const recieved = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestSent: b,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ rejected, recieved });
+  } catch (err) {
+    return res.status(401).json({
+      status: "failed",
+      message: "Something went wrong",
+    });
+  }
+});
+
+// Cancel Friend Request
+router.post("/cancelRequest/:id", async (req, res) => {
+  try {
+    const rejector = await User.findById(req.params.id).lean().exec();
+    const sender = await User.findById(req.body.id).lean().exec();
+
+    let a =
+      rejector.friendRequestSent.length == 0
+        ? []
+        : rejector.friendRequestSent.filter(
+          (i) => i.toString() !== req.body.id
+        );
+
+    let b =
+      sender.friendRequestRequest.length == 0
+        ? []
+        : sender.friendRequestRequest.filter(
+          (i) => i.toString() !== req.params.id
+        );
+    console.log(a, b);
+    const cancelledBy = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestSent: a,
+      },
+      { returnOriginal: false }
+    )
+      .lean()
+      .exec();
+
+    const canceledUser = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestRequest: b,
+      },
+      { returnOriginal: false }
+    )
+      .lean()
+      .exec();
+    res.status(201).json({ cancelledBy, canceledUser });
   } catch (err) {
     return res.status(401).json({
       status: "failed",
@@ -228,15 +305,23 @@ router.post("/unfriend/:id", async (req, res) => {
 
     aList = my.friends.filter((i) => i.toString() !== req.body.id);
 
-    const unfriended = await User.findByIdAndUpdate(req.body.id, {
-      friends: bList,
-    })
+    const unfriended = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friends: bList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const me = await User.findByIdAndUpdate(req.params.id, {
-      friends: aList,
-    })
+    const me = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friends: aList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ unfriended, me });
@@ -250,20 +335,29 @@ router.post("/unfriend/:id", async (req, res) => {
 
 // update User
 router.patch("/:id", async (req, res) => {
-  console.log(req.body)
-  const user = await User.findByIdAndUpdate(req.params.id, req.body)
-    .lean()
-    .exec();
-  console.log("patch succesful")
 
-  res.status(201).json({ user });
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      returnOriginal: false,
+    })
+      .lean()
+      .exec();
+
+    res.status(201).json({ user });
+  } catch (err) {
+    return res.status(401).json({ message: err });
+  }
 });
 // Get user details
 router.get("/:id", async (req, res) => {
-  const user = await User.findById(req.params.id).populate("friends").lean().exec();
-  console.log("succesful", user)
 
-  res.status(200).json({ user });
+  try {
+    const user = await User.findById(req.params.id).populate("friends").lean().exec();
+
+    res.status(200).json({ user });
+  } catch (err) {
+    return res.status(401).json({ message: err });
+  }
 });
 
 module.exports = router;

@@ -8,7 +8,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const comments = await Comment.find().lean().exec();
+  const comments = await Comment.find().sort({createdAt:-1}).lean().exec();
 
   console.log("comment get call made");
   res.status(200).json({ comments });
@@ -23,9 +23,11 @@ router.patch("/:id", async (req, res) => {
   res.status(201).json({ comment });
 });
 
-router.get("/:id", async (req, res) => {
-  const comment = await Comment.findById(req.params.id);
+router.delete("/:id", async (req, res) => {
+  const comment = await Comment.findByIdAndDelete(req.params.id);
   res.status(200).json({ comment });
 });
+
+
 
 module.exports = router;

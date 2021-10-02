@@ -40,7 +40,7 @@ const userSchema = mongoose.Schema(
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "post" }],
     dob: { type: String, required: false },
     gender: { type: String, required: false },
-    profile: { type: String, required: false, default: "" },
+    profile: { type: String, required: false },
     cover: { type: String, required: false },
     bio: { type: String, required: false },
     education1: { type: String, required: false },

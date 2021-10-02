@@ -53,7 +53,8 @@ const login = async (req, res) => {
     const token = newToken(user);
     let userOnline = await User.findOneAndUpdate(
       { email: main.email },
-      { isOnline: true }
+      { isOnline: true },
+      { returnOriginal: false }
     )
       .populate("friends")
       .populate("friendRequestSent")
