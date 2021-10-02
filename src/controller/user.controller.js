@@ -261,8 +261,9 @@ router.patch("/:id", async (req, res) => {
 // Get user details
 router.get("/:id", async (req, res) => {
   const user = await User.findById(req.params.id).populate("friends").lean().exec();
+  console.log("succesful", user)
 
-  res.status(201).json({ user });
+  res.status(200).json({ user });
 });
 
 module.exports = router;
