@@ -7,7 +7,7 @@ const port = process.env.PORT || 8080;
 const { register, login } = require("./controller/auth.controller");
 const postController = require("./controller/post.controller");
 const userController = require("./controller/user.controller");
-const commentController = require('./controller/comment.controller')
+const commentController = require("./controller/comment.controller");
 
 const app = express();
 app.use(cors());

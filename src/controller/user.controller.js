@@ -75,15 +75,23 @@ router.post("/sendRequest/:id", async (req, res) => {
       });
     }
 
-    const sent = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestSent: a,
-    })
+    const sent = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestSent: a,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const recieved = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestRecieved: b,
-    })
+    const recieved = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestRecieved: b,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ sent, recieved });
@@ -133,17 +141,25 @@ router.post("/acceptRequest/:id", async (req, res) => {
       });
     }
 
-    const sent = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestSent: b,
-      friends: bList,
-    })
+    const sent = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestSent: b,
+        friends: bList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const accepted = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestRecieved: a,
-      friends: aList,
-    })
+    const accepted = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestRecieved: a,
+        friends: aList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ sent, accepted });
@@ -175,15 +191,23 @@ router.post("/rejectRequest/:id", async (req, res) => {
             (i) => i.toString() !== req.params.id
           );
     console.log(a, b);
-    const rejected = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestRecieved: a,
-    })
+    const rejected = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestRecieved: a,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const recieved = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestSent: b,
-    })
+    const recieved = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestSent: b,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ rejected, recieved });
@@ -215,15 +239,23 @@ router.post("/cancelRequest/:id", async (req, res) => {
             (i) => i.toString() !== req.params.id
           );
     console.log(a, b);
-    const cancelledBy = await User.findByIdAndUpdate(req.params.id, {
-      friendRequestSent: a,
-    })
+    const cancelledBy = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friendRequestSent: a,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const canceledUser = await User.findByIdAndUpdate(req.body.id, {
-      friendRequestRequest: b,
-    })
+    const canceledUser = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friendRequestRequest: b,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ cancelledBy, canceledUser });
@@ -257,15 +289,23 @@ router.post("/unfriend/:id", async (req, res) => {
 
     aList = my.friends.filter((i) => i.toString() !== req.body.id);
 
-    const unfriended = await User.findByIdAndUpdate(req.body.id, {
-      friends: bList,
-    })
+    const unfriended = await User.findByIdAndUpdate(
+      req.body.id,
+      {
+        friends: bList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
 
-    const me = await User.findByIdAndUpdate(req.params.id, {
-      friends: aList,
-    })
+    const me = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        friends: aList,
+      },
+      { returnOriginal: false }
+    )
       .lean()
       .exec();
     res.status(201).json({ unfriended, me });
@@ -280,7 +320,9 @@ router.post("/unfriend/:id", async (req, res) => {
 // update User
 router.patch("/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body)
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      returnOriginal: false,
+    })
       .lean()
       .exec();
 
