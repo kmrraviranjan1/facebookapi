@@ -335,14 +335,14 @@ router.post("/unfriend/:id", async (req, res) => {
 
 // update User
 router.patch("/:id", async (req, res) => {
-
+  console.log(req.body)
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       returnOriginal: false,
     })
       .lean()
       .exec();
-
+    console.log("succ")
     res.status(201).json({ user });
   } catch (err) {
     return res.status(401).json({ message: err });

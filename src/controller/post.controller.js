@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const posts = await Post.find().sort({createdAt:-1}).lean().exec();
+  const posts = await Post.find().sort({ createdAt: -1 }).lean().exec();
 
   console.log("get call made");
   res.status(200).json({ posts });
@@ -37,9 +37,14 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/comments", async (req, res) => {
-  const comments = await Comment.find({post_id: req.params.id}).lean().exec();
+  const comments = await Comment.find({ post_id: req.params.id }).lean().exec();
 
   res.status(200).json({ comments });
 });
+router.get("/user/:id", async (req, res) => {
+  const posts = await Post.find({ user_id: req.params.id }).lean().exec();
+
+  res.status(200).json({ posts });
+})
 
 module.exports = router;
