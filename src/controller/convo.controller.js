@@ -16,8 +16,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // get convo
 
 router.get("/:id", async (req, res) => {
@@ -30,3 +28,23 @@ router.get("/:id", async (req, res) => {
     res.status(401).json({ err });
   }
 });
+
+router.get("/:id/:id2", async (req, res) => {
+  try {
+    const conversation = await Conversation.find({
+      $or: [
+        { members: { $eq: [req.params.id, req.params.id2] } },
+        { members: { $eq: [req.params.id2, req.params.id] } },
+      ],
+    });
+    if (conversation.length > 0) {
+      res.status(200).json({ conversation, present: true });
+    } else {
+      res.status(200).json({ conversation, present: false });
+    }
+  } catch (err) {
+    res.status(401).json({ err });
+  }
+});
+
+module.exports = router;

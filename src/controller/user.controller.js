@@ -7,6 +7,7 @@ router.get("/all/:id", async (req, res) => {
     $and: [
       { friends: { $nin: [req.params.id] } },
       { friendRequestRecieved: { $nin: [req.params.id] } },
+      { friendRequestSent: { $nin: [req.params.id] } },
       { _id: { $ne: req.params.id } },
     ],
   })
@@ -15,9 +16,35 @@ router.get("/all/:id", async (req, res) => {
 
   res.status(201).json({ user });
 });
+// Get all users to whom you sent friend request
+router.get("/sent/:id", async (req, res) => {
+  const userFriend = await User.findById(req.params.id)
+    .populate("friendRequestSent")
+    .lean()
+    .exec();
+  const user = userFriend.friendRequestSent;
+  res.status(201).json({ user });
+});
 
-// Get all friends
-router.get("/friends", async (req, res) => {});
+router.get("/request/:id", async (req, res) => {
+  const userFriend = await User.findById(req.params.id)
+    .populate("friendRequestRecieved")
+    .lean()
+    .exec();
+  const user = userFriend.friendRequestRecieved;
+
+  res.status(201).json({ user });
+});
+// Get all friends of a user
+router.get("/friends/:id", async (req, res) => {
+  const userFriend = await User.findById(req.params.id)
+    .populate("friends")
+    .lean()
+    .exec();
+  const user = userFriend.friends;
+
+  res.status(201).json({ user });
+});
 
 // send friend friendRequest
 router.post("/sendRequest/:id", async (req, res) => {
@@ -233,12 +260,12 @@ router.post("/cancelRequest/:id", async (req, res) => {
           );
 
     let b =
-      sender.friendRequestRequest.length == 0
+      sender.friendRequestRecieved.length == 0
         ? []
-        : sender.friendRequestRequest.filter(
+        : sender.friendRequestRecieved.filter(
             (i) => i.toString() !== req.params.id
           );
-    console.log(a, b);
+
     const cancelledBy = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -252,12 +279,13 @@ router.post("/cancelRequest/:id", async (req, res) => {
     const canceledUser = await User.findByIdAndUpdate(
       req.body.id,
       {
-        friendRequestRequest: b,
+        friendRequestRecieved: b,
       },
       { returnOriginal: false }
     )
       .lean()
       .exec();
+
     res.status(201).json({ cancelledBy, canceledUser });
   } catch (err) {
     return res.status(401).json({
