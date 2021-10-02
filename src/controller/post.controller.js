@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Post = require("../model/post.model");
 const Comment = require("../model/comment.model");
-
+const User = require('../model/user.model')
 router.post("/", async (req, res) => {
   const post = await Post.create(req.body);
   console.log("post call made");
@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const posts = await Post.find().sort({createdAt:-1}).lean().exec();
+  const posts = await Post.find().populate('user_id').sort({createdAt:-1}).lean().exec();
 
   console.log("get call made");
   res.status(200).json({ posts });
