@@ -27,6 +27,7 @@ const postSchema = new mongoose.Schema(
     commentd_by: { type: Number, required: false, default: 0 },
     no_of_shares: { type: Number, required: false, default: 0 },
     shared_by: { type: Number, required: false, default: 0 },
+    time: { type: String, required: false, default: 0 }
   },
   {
     versionKey: false,

@@ -4,8 +4,7 @@
   "description": "Backend api of facebook",
   "main": "index",
   "scripts": {
-   
-    "start":"nodemon index"
+    "start": "nodemon index"
   },
   "author": "Ravi Akshay Omkar Vaibhav",
   "license": "ISC",
