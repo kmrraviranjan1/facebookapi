@@ -37,7 +37,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/comments", async (req, res) => {
-  const comments = await Comment.find({post_id: req.params.id}).lean().exec();
+  const comments = await Comment.find({post_id: req.params.id}).populate('commentd_by').lean().exec();
 
   res.status(200).json({ comments });
 });

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Post = require('./post.model')
+const User = require('./user.model')
 const commentSchema = new mongoose.Schema(
   {
     post_id: { 
@@ -16,7 +17,9 @@ const commentSchema = new mongoose.Schema(
     no_of_likes: { type: Number, required: false, default: 0 },
     liked_by: { type: Number, required: false, default: 0 },
     no_of_comments: { type: Number, required: false, default: 0 },
-    commentd_by: { type: Number, required: false, default: 0 },
+    commentd_by: { type: mongoose.Schema.Types.ObjectId,
+      ref:'user',
+      required:true},
   },
   {
     versionKey: false,
