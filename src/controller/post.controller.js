@@ -36,20 +36,20 @@ router.get("/:id", async (req, res) => {
   res.status(200).json({ post });
 });
 
-router.get("/:id/comments", async (req, res) => {
+router.get("/comments/:id", async (req, res) => {
   const comments = await Comment.find({ post_id: req.params.id }).populate('commentd_by').lean().exec();
 
   res.status(200).json({ comments });
 });
 router.get("/user/:id", async (req, res) => {
   console.log(req.body)
-  const posts = await Post.find({ user_id: { _id: req.params.id } }).lean().exec();
+  const posts = await Post.find({ user_id: { _id: req.params.id } }).populate("user_id").lean().exec();
 
   res.status(200).json({ posts });
 })
 router.get("/otherusers/:id", async (req, res) => {
   console.log(req.body)
-  const posts = await Post.find({ $and: [{ "user_id._id": { $ne: req.params.id } }, { "user_id": { $ne: req.params.id } }] }).lean().exec();
+  const posts = await Post.find({ $and: [{ "user_id._id": { $ne: req.params.id } }, { "user_id": { $ne: req.params.id } }] }).populate("user_id").lean().exec();
 
   res.status(200).json({ posts });
 })
