@@ -17,16 +17,19 @@ const postSchema = new mongoose.Schema(
     checkin: { type: String, required: false, default: null },
     hostQna: { type: String, required: false, default: null },
     no_of_likes: { type: Number, required: false, default: 0 },
-    liked_by: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-      required: false,
-      default: 0,
-    }],
+    liked_by: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: false,
+        default: 0,
+      },
+    ],
     no_of_comments: { type: Number, required: false, default: 0 },
     commentd_by: { type: Number, required: false, default: 0 },
     no_of_shares: { type: Number, required: false, default: 0 },
     shared_by: { type: Number, required: false, default: 0 },
+    time: { type: String, required: false, default: 0 },
   },
   {
     versionKey: false,
