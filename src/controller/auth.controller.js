@@ -7,6 +7,8 @@ const newToken = (user) => {
 };
 
 const register = async (req, res) => {
+
+  console.log(req.body)
   try {
     let email = req.body.email;
     let user = await User.findOne({ email: email }).lean().exec();

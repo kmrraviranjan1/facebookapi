@@ -46,6 +46,22 @@ router.get("/friends/:id", async (req, res) => {
   res.status(201).json({ user });
 });
 
+//get all users who are not his friends
+router.get("", async (req, res) => {
+  const users = await User.find().populate("friends").lean().exec();
+
+  res.status(201).json({ users });
+});
+
+//dummy user post request
+router.post("", async (req, res) => {
+  console.log(req.body);
+  const user = await User.create(req.body);
+  return res.status(201).json({ user });
+});
+// Get all friends
+router.get("/friends", async (req, res) => {});
+
 // send friend friendRequest
 router.post("/sendRequest/:id", async (req, res) => {
   try {
@@ -262,10 +278,10 @@ router.post("/cancelRequest/:id", async (req, res) => {
     let b =
       sender.friendRequestRecieved.length == 0
         ? []
-        : sender.friendRequestRecieved.filter(
+        : sender.friendRequestRequest.filter(
             (i) => i.toString() !== req.params.id
           );
-
+    console.log(a, b);
     const cancelledBy = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -347,13 +363,14 @@ router.post("/unfriend/:id", async (req, res) => {
 
 // update User
 router.patch("/:id", async (req, res) => {
+  console.log(req.body);
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       returnOriginal: false,
     })
       .lean()
       .exec();
-
+    console.log("succ");
     res.status(201).json({ user });
   } catch (err) {
     return res.status(401).json({ message: err });
@@ -362,9 +379,12 @@ router.patch("/:id", async (req, res) => {
 // Get user details
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).lean().exec();
+    const user = await User.findById(req.params.id)
+      .populate("friends")
+      .lean()
+      .exec();
 
-    res.status(201).json({ user });
+    res.status(200).json({ user });
   } catch (err) {
     return res.status(401).json({ message: err });
   }
