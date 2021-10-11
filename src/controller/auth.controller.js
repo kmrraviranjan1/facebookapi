@@ -7,6 +7,8 @@ const newToken = (user) => {
 };
 
 const register = async (req, res) => {
+
+  console.log(req.body)
   try {
     let email = req.body.email;
     let user = await User.findOne({ email: email }).lean().exec();
@@ -51,7 +53,8 @@ const login = async (req, res) => {
     const token = newToken(user);
     let userOnline = await User.findOneAndUpdate(
       { email: main.email },
-      { isOnline: true }
+      { isOnline: true },
+      { returnOriginal: false }
     )
       .populate("friends")
       .populate("friendRequestSent")
