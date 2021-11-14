@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema(
       required: true,
       minLength: 3,
       maxLength: 20,
-      unique: true,
+  
     },
     last_name: { type: String, required: false, maxLength: 20 },
     email: {
@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
       lowercase: true,
-      unique: true,
+    
       validate: [validateEmail, "Please fill a valid email address"],
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,

@@ -8,8 +8,8 @@ const newToken = (user) => {
 
 const register = async (req, res) => {
 
-  console.log(req.body)
   try {
+    console.log(req.body)
     let email = req.body.email;
     let user = await User.findOne({ email: email }).lean().exec();
     if (user) {
@@ -23,6 +23,7 @@ const register = async (req, res) => {
       res.status(201).json({ token, user });
     }
   } catch (err) {
+    console.log('error in back',err)
     return res.status(401).json({
       status: "failed",
       message: "Something went wrong",
